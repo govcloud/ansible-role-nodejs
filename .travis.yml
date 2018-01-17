@@ -1,0 +1,37 @@
+---
+services: docker
+
+env:
+  # Defaults.
+  - distro: ubuntu1604
+  - distro: ubuntu1404
+
+  # Latest release.
+  - distro: ubuntu1604
+    playbook: test-latest.yml
+
+script:
+  # Configure test script so we can run extra tests after playbook is run.
+  - export container_id=$(date +%s)
+  - export cleanup=false
+
+  # Download test shim.
+  - wget -O ${PWD}/tests/test.sh https://gist.githubusercontent.com/sylus/e5d6eb8852d649ae78477b2daf86e707/raw
+  - chmod +x ${PWD}/tests/test.sh
+
+  # Run tests.
+  - ${PWD}/tests/test.sh
+
+  # Ensure Node.js is installed.
+  - 'docker exec --tty ${container_id} env TERM=xterm which node'
+  - 'docker exec --tty ${container_id} env TERM=xterm node -v'
+
+  # Ensure npm packages are installed globally.
+  - 'docker exec --tty ${container_id} env TERM=xterm bash --login -c "npm list -g --depth=0 jslint"'
+  - 'docker exec --tty ${container_id} env TERM=xterm bash --login -c "npm list -g --depth=0 node-sass"'
+  - 'docker exec --tty ${container_id} env TERM=xterm bash --login -c "npm list -g --depth=0 yo"'
+
+notifications:
+  slack:
+    secure: aO25ubSWTNVUhBymcuRwu9YPuOSu8GwuBj6TIJaXuH7H6Mv7aYfPdDIxx9WJdtQC1534EGLFkObjwRdkvps6VGsercWfTeL9Y1bHORidh5O8MvZ/WmYWWTPOG39mTUGz4p1/A0YXVGuF5FWziK61IMne5fGD1jGxyk91lAKllddnVv+6Ok4fphZgH3d8Wua7xIwVa0tRALB+zgJdUwWCRoJ7YVSRsch7sy76MrIIVkqW42q2ESlzlmgQ0S0Up3jegdb0mxav1h7kI9uzKbr0qmAgPwpwlFcrlxEx7a+YY8Mkbd7Wo420vO6OaDorfLyuxgmgrWQLlx5GBHnB58wXtHDnLA9t2tAJ+6bDCBPdY7TT41VY381TTyNPwFWqFyWQVU3U3q/z5GjvcA7L1fhfCorN+cKJcaGOMevLefh5q9hhTv0NahD1jZRuGStlAl2PaXbxsnbBOf3FDAteohJgky3QnKbF2HhG/npPvIo4clIgN/I9VNrsxGgvP0X1LSEH0hZD2eFrarlBFxUaWU/nva0DSOMaPEaAQ7ixLM4VqWh7YaZWlNyLVLxALgQW5Ursc0f1fD6AEs/kD3j1/5srkfIcxLRT0zMaLdDKkDNjwo9Bt5DoiN41TJywMBC9E86hBO48/lywqbK/751Y3d+OTQFnoaNWryMK5/1iWffweUM=
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
