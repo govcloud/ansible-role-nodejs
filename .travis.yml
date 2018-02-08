@@ -3,10 +3,12 @@ services: docker
 
 env:
   # Defaults.
+	- distro: centos7
   - distro: ubuntu1604
-  - distro: ubuntu1404
 
   # Latest release.
+  - distro: centos7
+    playbook: test-latest.yml
   - distro: ubuntu1604
     playbook: test-latest.yml
 
