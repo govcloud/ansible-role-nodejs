@@ -2,9 +2,6 @@
 - include: RedHat.yml
   when: ansible_os_family == 'RedHat'
 
-- include: Debian.yml
-  when: ansible_os_family == 'Debian'
-
 - name: Define nodejs_install_npm_user
   set_fact:
     nodejs_install_npm_user: "{{ ansible_user | default(lookup('env', 'USER')) }}"
